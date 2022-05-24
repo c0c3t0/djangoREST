@@ -1,13 +1,36 @@
 from django.shortcuts import render
-from rest_framework import serializers
+from rest_framework import serializers, permissions
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 # from rest_framework.views import APIView
 
-from djangoREST.api.models import Product
+from djangoREST.api.models import Product, Category
+
+
+class IdAndNameCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('id', 'name')
+
+
+class IdAndNameProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'name')
+
+
+class FullCategorySerializer(serializers.ModelSerializer):
+    product_set = IdAndNameCategorySerializer(many=True)
+
+    class Meta:
+        model = Category
+        fields = '__all__'
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    # category = serializers.StringRelatedField(many=False)
+    category = IdAndNameCategorySerializer()
+
     class Meta:
         model = Product
         fields = '__all__'
@@ -35,6 +58,17 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductsListView(ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+#     access if user is authenticated:
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+
+
+class CategoriesListView(ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = FullCategorySerializer
+
 
 class SingleProductView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
