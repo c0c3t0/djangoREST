@@ -4,6 +4,6 @@ from djangoREST.api.views import ProductsListView, SingleProductView, Categories
 
 urlpatterns = [
     path('products/', ProductsListView.as_view(), name='product list'),
-    path('products/<int:pk>', SingleProductView.as_view(), name='product'),
+    path('products/<int:pk>/', SingleProductView.as_view(), name='product'),
     path('categories/', CategoriesListView.as_view(), name='category list'),
 ]
